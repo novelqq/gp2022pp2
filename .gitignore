@@ -1,0 +1,7 @@
+redist/
+bin/
+dump/
+res/.tmp/
+
+# VScode
+.vscode/settings.json
