@@ -57,9 +57,19 @@ class Level extends GameProcess {
 
 		var tg = new h2d.TileGroup(tilesetSource, root);
 
-		var layer = data.l_Grass;
-		for( autoTile in layer.autoTiles ) {
-			var tile = layer.tileset.getAutoLayerTile(autoTile);
+		var layer1 = data.l_Grass;
+		var layer2 = data.l_Trees;
+		var layer3 = data.l_Water;
+		for( autoTile in layer1.autoTiles ) {
+			var tile = layer1.tileset.getAutoLayerTile(autoTile);
+			tg.add(autoTile.renderX, autoTile.renderY, tile);
+		}
+		for( autoTile in layer2.autoTiles ) {
+			var tile = layer2.tileset.getAutoLayerTile(autoTile);
+			tg.add(autoTile.renderX, autoTile.renderY, tile);
+		}
+		for( autoTile in layer3.autoTiles ) {
+			var tile = layer3.tileset.getAutoLayerTile(autoTile);
 			tg.add(autoTile.renderX, autoTile.renderY, tile);
 		}
 	}
