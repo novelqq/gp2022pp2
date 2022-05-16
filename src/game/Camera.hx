@@ -52,7 +52,7 @@ class Camera extends GameProcess {
 	var trackingSpeed = 1.0;
 
 	/** If TRUE (default), the camera will try to stay inside level bounds. It cannot be done if level is smaller than actual viewport. In such case, the camera will be centered. **/
-	public var clampToLevelBounds = false;
+	public var clampToLevelBounds = true;
 	var brakeDistNearBounds = 0.1;
 
 

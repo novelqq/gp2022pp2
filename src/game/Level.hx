@@ -1,9 +1,9 @@
 class Level extends GameProcess {
 	/** Level grid-based width**/
-	public var cWid(get,never) : Int; inline function get_cWid() return data.l_Collisions.cWid;
+	public var cWid(get,never) : Int; inline function get_cWid() return data.l_Grass.cWid;
 
 	/** Level grid-based height **/
-	public var cHei(get,never) : Int; inline function get_cHei() return data.l_Collisions.cHei;
+	public var cHei(get,never) : Int; inline function get_cHei() return data.l_Grass.cHei;
 
 	/** Level pixel width**/
 	public var pxWid(get,never) : Int; inline function get_pxWid() return cWid*Const.GRID;
@@ -22,7 +22,7 @@ class Level extends GameProcess {
 
 		createRootInLayers(Game.ME.scroller, Const.DP_BG);
 		data = ldtkLevel;
-		tilesetSource = hxd.Res.levels.sampleWorldTiles.toAseprite().toTile();
+		tilesetSource = hxd.Res.atlas.MasterSimple.toTile();
 		marks = new MarkerMap(cWid, cHei);
 	}
 
@@ -45,9 +45,9 @@ class Level extends GameProcess {
 		invalidated = true;
 	}
 
-	/** Return TRUE if "Collisions" layer contains a collision value **/
+	/** Return TRUE if "Grass" layer does not contain grass **/
 	public inline function hasCollision(cx,cy) : Bool {
-		return !isValid(cx,cy) ? true : data.l_Collisions.getInt(cx,cy)==1;
+		return !isValid(cx,cy) ? true : !(data.l_Grass.getInt(cx,cy)==1);
 	}
 
 	/** Render current level**/
@@ -57,11 +57,15 @@ class Level extends GameProcess {
 
 		var tg = new h2d.TileGroup(tilesetSource, root);
 
-		var layer = data.l_Collisions;
+		var layer = data.l_Grass;
 		for( autoTile in layer.autoTiles ) {
 			var tile = layer.tileset.getAutoLayerTile(autoTile);
 			tg.add(autoTile.renderX, autoTile.renderY, tile);
 		}
+
+		// Alternate render
+		// var layerRender = data.l_Grass.render();
+		// root.addChild( layerRender );
 	}
 
 	override function postUpdate() {
