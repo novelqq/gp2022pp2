@@ -22,7 +22,7 @@ class Level extends GameProcess {
 
 		createRootInLayers(Game.ME.scroller, Const.DP_BG);
 		data = ldtkLevel;
-		tilesetSource = hxd.Res.atlas.MasterSimple.toTile();
+		tilesetSource = hxd.Res.levels.MasterSimple.toTile();
 		marks = new MarkerMap(cWid, cHei);
 	}
 
@@ -53,7 +53,7 @@ class Level extends GameProcess {
 	/** Render current level**/
 	function render() {
 		// Placeholder level render
-		root.removeChildren();
+		//root.removeChildren();
 
 		var tg = new h2d.TileGroup(tilesetSource, root);
 
@@ -62,10 +62,6 @@ class Level extends GameProcess {
 			var tile = layer.tileset.getAutoLayerTile(autoTile);
 			tg.add(autoTile.renderX, autoTile.renderY, tile);
 		}
-
-		// Alternate render
-		// var layerRender = data.l_Grass.render();
-		// root.addChild( layerRender );
 	}
 
 	override function postUpdate() {
