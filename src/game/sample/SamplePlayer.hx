@@ -11,7 +11,11 @@ package sample;
 class SamplePlayer extends Entity {
 	var ca : ControllerAccess<GameAction>;
 	var walkSpeed = 0.;
-
+	var move_right : Bool = false;
+	var move_left : Bool = false;
+	var move_up : Bool = false;
+	var move_down: Bool = false;
+	var cooldown_frames: Int = 0;
 	// This is TRUE if the player is not falling
 	var onGround(get,never) : Bool;
 		inline function get_onGround() return !destroyed && dy==0 && yr==1 && level.hasCollision(cx,cy+1);
@@ -82,7 +86,13 @@ class SamplePlayer extends Entity {
 			yr = 0.2;
 	}
 
-
+	private function resetInput() {
+		move_left = false;
+		move_right = false;
+		move_up = false;
+		move_down = false;
+		cooldown_frames = 5;
+	}
 	/**
 		Control inputs are checked at the beginning of the frame.
 		VERY IMPORTANT NOTE: because game physics only occur during the `fixedUpdate` (at a constant 30 FPS), no physics increment should ever happen here! What this means is that you can SET a physics value (eg. see the Jump below), but not make any calculation that happens over multiple frames (eg. increment X speed when walking).
@@ -94,35 +104,47 @@ class SamplePlayer extends Entity {
 		if( onGround )
 			cd.setS("recentlyOnGround",0.1); // allows "just-in-time" jumps
 
-
-		// Jump
-		if( cd.has("recentlyOnGround") && ca.isPressed(Jump) ) {
-			dy = -0.85;
-			setSquashX(0.6);
-			cd.unset("recentlyOnGround");
-			fx.dotsExplosionExample(centerX, centerY, 0xffcc00);
-			ca.rumble(0.05, 0.06);
-		}
-
 		// Walk
-		if( ca.getAnalogDist2(MoveLeft,MoveRight)>0 ) {
-			// As mentioned above, we don't touch physics values (eg. `dx`) here. We just store some "requested walk speed", which will be applied to actual physics in fixedUpdate.
-			walkSpeed = ca.getAnalogValue2(MoveLeft,MoveRight); // -1 to 1
-		}
+		move_left = ca.isDown(MoveLeft);
+		move_right = ca.isDown(MoveRight);
+		move_up = ca.isDown(MoveUp);
+		move_down = ca.isDown(MoveDown);
 	}
 
 
 	override function fixedUpdate() {
 		super.fixedUpdate();
 
-		// Gravity
-		if( !onGround )
-			dy+=0.05;
-
 		// Apply requested walk movement
-		if( walkSpeed!=0 ) {
-			var speed = 0.045;
-			dx += walkSpeed * speed;
+		if(cooldown_frames == 0) {
+			if(move_right){
+				if (!level.hasCollision(cx+1, cy)){
+					cx += 1;
+				}
+				resetInput();
+			}
+			if(move_left){
+				if (!level.hasCollision(cx-1, cy)){
+					cx -= 1;
+				}
+				resetInput();
+			}
+			if(move_down){
+				if (!level.hasCollision(cx, cy+1)){
+					cy += 1;
+				}
+				resetInput();
+			}
+			if(move_up){
+				if (!level.hasCollision(cx, cy-1)){
+					cy -= 1;
+				}
+				resetInput();
+			}
 		}
+		else {
+			cooldown_frames -= 1;
+		}
+		//dx += walkSpeed * speed;
 	}
 }
