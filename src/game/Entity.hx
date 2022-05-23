@@ -667,14 +667,6 @@ class Entity {
 				n++;
 			}
 		}
-
-		// X frictions
-		dx *= frictX;
-		if( M.fabs(dx) <= 0.0005 ) dx = 0;
-
-		// Y frictions
-		dy *= frictY;
-		if( M.fabs(dy) <= 0.0005 ) dy = 0;
 	}
 
 
