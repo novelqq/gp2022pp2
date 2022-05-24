@@ -41,7 +41,7 @@ class SamplePlayer extends Entity {
 		// Placeholder display
 		var g = new h2d.Graphics(spr);
 		g.beginFill(0x00ff00);
-		g.drawCircle(0,0,9);
+		g.drawCircle(0,0,8);
 	}
 
 
@@ -62,7 +62,7 @@ class SamplePlayer extends Entity {
 		super.onPreStepY();
 	}
 
-	private function resetInput() {
+	private inline function resetInput() {
 		move_left = move_right = move_up = move_down = false;
 		cooldown_frames = 2;
 		temp_dx = temp_dy = 0;
