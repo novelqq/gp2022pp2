@@ -10,20 +10,23 @@ package sample;
 
 class SamplePlayer extends Entity {
 	var ca : ControllerAccess<GameAction>;
-	var speed = 0.;
 	var move_right : Bool = false;
 	var move_left : Bool = false;
 	var move_up : Bool = false;
 	var move_down: Bool = false;
-	var is_moving = false;
-	var move_frames = 4;
 	var cooldown_frames: Int = 0;
+	var is_moving: Bool = false;
+	var move_frames: Int = 4;
+	var manual_float_error = 1e-10;
+
+	var temp_dx = 0.;
+	var temp_dy = 0.;
 
 	public function new() {
 		super(5,5);
 
-		// Start point using level entity "PlayerStart"
-		var start = level.data.l_Entities.all_PlayerStart[0];
+		// Start point using level entity "Player"
+		var start = level.data.l_Entities.all_Player[0];
 		if( start!=null )
 			setPosCase(start.cx, start.cy);
 
@@ -38,7 +41,7 @@ class SamplePlayer extends Entity {
 		// Placeholder display
 		var g = new h2d.Graphics(spr);
 		g.beginFill(0x00ff00);
-		g.drawCircle(0,-hei*0.5,9);
+		g.drawCircle(0,0,9);
 	}
 
 
@@ -51,35 +54,19 @@ class SamplePlayer extends Entity {
 	/** X collisions **/
 	override function onPreStepX() {
 		super.onPreStepX();
-
-		// Right collision
-		if( xr>0.8 && level.hasCollision(cx+1,cy) )
-			xr = 0.8;
-
-		// Left collision
-		if( xr<0.2 && level.hasCollision(cx-1,cy) )
-			xr = 0.2;
 	}
 
 
 	/** Y collisions **/
 	override function onPreStepY() {
 		super.onPreStepY();
-
-		// Land on ground
-		if( yr>1 && level.hasCollision(cx,cy+1) ) {
-			yr = 1;
-		}
-
-		// Ceiling collision
-		if( yr<0.2 && level.hasCollision(cx,cy-1) )
-			yr = 0.2;
 	}
 
 	private function resetInput() {
 		move_left = move_right = move_up = move_down = false;
-		cooldown_frames = 5;
-		dx = dy = 0;
+		cooldown_frames = 2;
+		temp_dx = temp_dy = 0;
+		is_moving = false;
 	}
 	/**
 		Control inputs are checked at the beginning of the frame.
@@ -88,35 +75,61 @@ class SamplePlayer extends Entity {
 	override function preUpdate() {
 		super.preUpdate();
 
-		walkSpeed = 0;
-
 		// Walk
 		if (!is_moving) {
 			move_left = ca.isDown(MoveLeft);
 			move_right = ca.isDown(MoveRight);
 			move_up = ca.isDown(MoveUp);
 			move_down = ca.isDown(MoveDown);
+			if (move_left && move_right) {
+				move_left = move_right = false;
+			}
+			if (move_up && move_down) {
+				move_up = move_down = false;
+			}
+			if ((move_left || move_right) && (move_up || move_down)) {
+				move_left = move_right = move_up = move_down = false;
+			}
 		}
 		
-		if (!is_moving && (move_left || move_right || move_up || move_down)) {
-			is_moving = true;
-			dx -= move_left ? 1/move_frames : 0;
-			dx += move_right ? 1/move_frames : 0;
-			dy -= move_up ? 1/move_frames : 0;
-			dy += move_down ? 1/move_frames : 0;
-		}
+		
 	}
 
 
 	override function fixedUpdate() {
 		super.fixedUpdate();
 
-		// Apply requested walk movement
-		if( walkSpeed!=0 ) {
-			dx += walkSpeed * speed;
+		//collisions and pushing logic here, probably need to refactor later
+		//TODO: write "try_move_left" method that recursively tries to push each block to the left.
+		if (cooldown_frames == 0 && !is_moving) {
+			if (move_left && !level.hasCollision(cx-1, cy)) {
+				temp_dx = -1/move_frames;
+				is_moving = true;
+			} else if (move_right && !level.hasCollision(cx+1,cy)) {
+				temp_dx = 1/move_frames;
+				is_moving = true;
+			} else if (move_up && !level.hasCollision(cx, cy-1)) {
+				temp_dy = -1/move_frames;
+				is_moving = true;
+			} else if (move_down && !level.hasCollision(cx, cy+1)) {
+				temp_dy = 1/move_frames;
+				is_moving = true;
+			}
 		}
-		if( climbSpeed!=0) {
-			dy += climbSpeed * speed;
+
+		if (is_moving) {
+			xr += temp_dx;
+			yr += temp_dy;
+			while (xr > 1) {cx++; xr--;}
+			while (xr < 0) {cx--; xr++;}
+			while (yr > 1) {cy++; yr--;}
+			while (yr < 0) {cy--; yr++;}
+			if (Math.abs(xr - 0.5) < manual_float_error && Math.abs(yr - 0.5) < manual_float_error) {
+				xr = yr = 0.5;
+				resetInput();
+			}
+		} else if (cooldown_frames > 0) {
+			cooldown_frames -= 1;
 		}
 	}
 }

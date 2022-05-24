@@ -41,7 +41,7 @@ class Entity {
 	/** Sub-grid X coordinate (from 0.0 to 1.0) **/
     public var xr = 0.5;
 	/** Sub-grid Y coordinate (from 0.0 to 1.0) **/
-    public var yr = 1.0;
+    public var yr = 0.5;
 
 	/** X velocity, in grid fractions **/
     public var dx = 0.;
@@ -55,15 +55,6 @@ class Entity {
 
 	/** If TRUE, the sprite display coordinates will be an interpolation between the last known position and the current one. This is useful if the gameplay happens in the `fixedUpdate()` (so at 30 FPS), but you still want the sprite position to move smoothly at 60 FPS or more. **/
 	var interpolateSprPos = true;
-
-	/** Multiplier applied on each frame to normal X velocity **/
-	public var frictX = 0.82;
-	/** Multiplier applied on each frame to normal Y velocity **/
-	public var frictY = 0.82;
-
-	/** Sets both frictX/Y at the same time **/
-	public var frict(never,set) : Float;
-		inline function set_frict(v) return frictX = frictY = v;
 
 	/** Pixel width of entity **/
 	public var wid(default,set) : Float = Const.GRID;
@@ -225,7 +216,7 @@ class Entity {
 		cx = x;
 		cy = y;
 		xr = 0.5;
-		yr = 1;
+		yr = 0.5;
 		onPosManuallyChangedBoth();
 	}
 
@@ -637,36 +628,6 @@ class Entity {
 	**/
 	public function fixedUpdate() {
 		updateLastFixedUpdatePos();
-
-		/*
-			Stepping: any movement greater than 33% of grid size (ie. 0.33) will increase the number of `steps` here. These steps will break down the full movement into smaller iterations to avoid jumping over grid collisions.
-		*/
-		var steps = M.ceil( ( M.fabs(dx) + M.fabs(dy) ) / 0.33 );
-		if( steps>0 ) {
-			var n = 0;
-			while ( n<steps ) {
-				// X movement
-				xr += dx / steps;
-
-				if( dx!=0 )
-					onPreStepX(); // <---- Add X collisions checks and physics in here
-
-				while( xr>1 ) { xr--; cx++; }
-				while( xr<0 ) { xr++; cx--; }
-
-
-				// Y movement
-				yr += dy / steps;
-
-				if( dy!=0 )
-					onPreStepY(); // <---- Add Y collisions checks and physics in here
-
-				while( yr>1 ) { yr--; cy++; }
-				while( yr<0 ) { yr++; cy--; }
-
-				n++;
-			}
-		}
 	}
 
 

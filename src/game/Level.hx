@@ -1,9 +1,9 @@
 class Level extends GameProcess {
 	/** Level grid-based width**/
-	public var cWid(get,never) : Int; inline function get_cWid() return data.l_Grass.cWid;
+	public var cWid(get,never) : Int; inline function get_cWid() return data.l_Ground.cWid;
 
 	/** Level grid-based height **/
-	public var cHei(get,never) : Int; inline function get_cHei() return data.l_Grass.cHei;
+	public var cHei(get,never) : Int; inline function get_cHei() return data.l_Ground.cHei;
 
 	/** Level pixel width**/
 	public var pxWid(get,never) : Int; inline function get_pxWid() return cWid*Const.GRID;
@@ -45,22 +45,22 @@ class Level extends GameProcess {
 		invalidated = true;
 	}
 
-	/** Return TRUE if "Grass" layer does not contain grass **/
+	/** Return TRUE if "Ground" layer does not contain ground **/
 	public inline function hasCollision(cx,cy) : Bool {
-		return !isValid(cx,cy) ? true : !(data.l_Grass.getInt(cx,cy)==1);
+		return !isValid(cx,cy) ? true : !(data.l_Ground.getInt(cx,cy)==1);
 	}
 
 	/** Render current level**/
 	function render() {
-		// Placeholder level render
-		//root.removeChildren();
 
+		root.removeChildren();
 		var tg = new h2d.TileGroup(tilesetSource, root);
 
 		//TODO: De-jankify this
-		var layer1 = data.l_Grass;
+		var layer1 = data.l_Ground;
 		var layer2 = data.l_Trees;
-		var layer3 = data.l_Water;
+		var layer3 = data.l_Walls;
+		//var layer4 = data.l_Grass;
 		for( autoTile in layer1.autoTiles ) {
 			var tile = layer1.tileset.getAutoLayerTile(autoTile);
 			tg.add(autoTile.renderX, autoTile.renderY, tile);
@@ -73,6 +73,15 @@ class Level extends GameProcess {
 			var tile = layer3.tileset.getAutoLayerTile(autoTile);
 			tg.add(autoTile.renderX, autoTile.renderY, tile);
 		}
+		
+		// for (gridTile in layer4.gridTiles) {
+		// 	var tile = layer4.tileset.get;
+		// 	tg.add(gridTile.renderX, gridTile.renderY, tile);
+		// }
+		// layer1.render(tg);
+		// layer3.render(tg);
+		//layer4.render(tg);
+
 	}
 
 	override function postUpdate() {
