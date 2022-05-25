@@ -16,17 +16,14 @@ class Entity {
 	public var hud(get,never) : ui.Hud; inline function get_hud() return Game.ME.hud;
 
 	/**	Attributes **/
-	public var isPushable = true;
-	public var isSolid = true;
+	public var isPushable = false;
+	public var isSolid = false;
 
 	/** Cooldowns **/
 	public var cd : dn.Cooldown;
 
 	/** Cooldowns, unaffected by slowmo (ie. always in realtime) **/
 	public var ucd : dn.Cooldown;
-
-	/** Temporary gameplay affects **/
-	var affects : Map<Affect,Float> = new Map();
 
 	/** State machine. Value should only be changed using `startState(v)` **/
 	public var state(default,null) : State;
@@ -296,12 +293,6 @@ class Entity {
 	/** Called when state is changed to a new value **/
 	function onStateChange(old:State, newState:State) {}
 
-	/** Reset velocities to zero **/
-	public function cancelVelocities() {
-		dx = 0;
-		dy = 0;
-	}
-
 	public function is<T:Entity>(c:Class<T>) return Std.isOfType(this, c);
 	public function as<T:Entity>(c:Class<T>) : T return Std.downcast(this, c);
 
@@ -312,10 +303,6 @@ class Entity {
 
 	/** Truncate a float value using given `precision` **/
 	public inline function pretty(value:Float,?precision=1) return M.pretty(value,precision);
-
-	public inline function dirTo(e:Entity) return e.centerX<centerX ? -1 : 1;
-	public inline function dirToAng() return dir==1 ? 0. : M.PI;
-	public inline function getMoveAng() return Math.atan2(dy,dx);
 
 	/** Return a distance (in grid cells) from this to something **/
 	public inline function distCase(?e:Entity, ?tcx:Int, ?tcy:Int, ?txr=0.5, ?tyr=0.5) {
@@ -444,58 +431,6 @@ class Entity {
 		debugBounds.drawCircle(centerX-attachX, centerY-attachY, 3);
 	}
 
-
-	public inline function hasAffect(k:Affect) {
-		return affects.exists(k) && affects.get(k)>0;
-	}
-
-	public inline function getAffectDurationS(k:Affect) {
-		return hasAffect(k) ? affects.get(k) : 0.;
-	}
-
-	/** Add an Affect. If `allowLower` is TRUE, it is possible to override an existing Affect with a shorter duration. **/
-	public function setAffectS(k:Affect, t:Float, ?allowLower=false) {
-		if(affects.exists(k) && affects.get(k)>t && !allowLower )
-			return;
-
-		if( t<=0 )
-			clearAffect(k);
-		else {
-			var isNew = !hasAffect(k);
-			affects.set(k,t);
-			if( isNew )
-				onAffectStart(k);
-		}
-	}
-
-	/** Multiply an Affect duration by a factor `f` **/
-	public function mulAffectS(k:Affect, f:Float) {
-		if( hasAffect(k) )
-			setAffectS(k, getAffectDurationS(k)*f, true);
-	}
-
-	public function clearAffect(k:Affect) {
-		if( hasAffect(k) ) {
-			affects.remove(k);
-			onAffectEnd(k);
-		}
-	}
-
-	/** Affects update loop **/
-	function updateAffects() {
-		for(k in affects.keys()) {
-			var t = affects.get(k);
-			t-=1/Const.FPS * tmod;
-			if( t<=0 )
-				clearAffect(k);
-			else
-				affects.set(k,t);
-		}
-	}
-
-	function onAffectStart(k:Affect) {}
-	function onAffectEnd(k:Affect) {}
-
 	/** Blink `spr` briefly (eg. when damaged by something) **/
 	public function blink(c:UInt) {
 		blinkColor.setColor(c);
@@ -527,18 +462,9 @@ class Entity {
     public function preUpdate() {
 		ucd.update(utmod);
 		cd.update(tmod);
-		updateAffects();
 
 
 		#if debug
-		// Display the list of active "affects" (with `/set affect` in console)
-		if( ui.Console.ME.hasFlag("affect") ) {
-			var all = [];
-			for(k in affects.keys())
-				all.push( k+"=>"+M.pretty( getAffectDurationS(k) , 1) );
-			debug(all);
-		}
-
 		// Show bounds (with `/bounds` in console)
 		if( ui.Console.ME.hasFlag("bounds") && debugBounds==null )
 			enableDebugBounds();
@@ -612,8 +538,6 @@ class Entity {
 		lastFixedUpdateY = attachY;
 	}
 
-
-
 	/** Called at the beginning of each X movement step **/
 	function onPreStepX() {
 	}
@@ -622,7 +546,6 @@ class Entity {
 	function onPreStepY() {
 	}
 
-
 	/**
 		Main loop, but it only runs at a "guaranteed" 30 fps (so it might not be called during some frames, if the app runs at 60fps). This is usually where most gameplay elements affecting physics should occur, to ensure these will not depend on FPS at all.
 	**/
@@ -630,10 +553,15 @@ class Entity {
 		updateLastFixedUpdatePos();
 	}
 
-
 	/**
 		Main loop running at full FPS (ie. always happen once on every frames, after preUpdate and before  postUpdate)
 	**/
     public function frameUpdate() {
     }
+
+	//these exist to be inherited
+	function tryMoveLeft():Bool {return false;}
+	function tryMoveRight():Bool {return false;}
+	function tryMoveUp():Bool {return false;}
+	function tryMoveDown():Bool {return false;}
 }
