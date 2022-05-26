@@ -18,18 +18,21 @@ class SampleBox extends Entity {
     function makeSprite() {
 		var b = new h2d.Graphics(spr);
 		b.beginFill(0xff00ff);
-		b.drawRect(-hei*0.5,-wid*0.5,hei,wid);
+		b.drawRect(-wid*0.5,-hei*0.5,hei,wid);
 	}
 
     override function dispose() {
 		super.dispose();
 	}
 
+    //recursively try to push boxes, returning false if unable to be pushed (hits a wall)
+    //returns true and begins movement if able to be pushed
     override function tryMoveLeft() {
         if (level.hasCollision(cx-1, cy)) {
             return false;
         }
         for (entity in Entity.ALL) {
+            //checks if a box is to the left, and if so, if it can move or not
             if (Std.isOfType(entity, SampleBox) && entity.cx == cx-1 && entity.cy == cy && !entity.tryMoveLeft()) {
                 return false;
             }

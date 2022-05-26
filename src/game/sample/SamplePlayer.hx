@@ -20,8 +20,8 @@ class SamplePlayer extends SampleBox {
 	public function new() {
 		super(5,5);
 
-		// Start point using level entity "Player"
-		var start = level.data.l_Entities.all_Player[0];
+		// Start point using level entity "PlayerStart"
+		var start = level.data.l_Entities.all_PlayerStart[0];
 		if( start!=null )
 			setPosCase(start.cx, start.cy);
 
