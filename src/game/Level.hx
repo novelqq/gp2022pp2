@@ -1,9 +1,9 @@
 class Level extends GameProcess {
 	/** Level grid-based width**/
-	public var cWid(get,never) : Int; inline function get_cWid() return data.l_Collisions.cWid;
+	public var cWid(get,never) : Int; inline function get_cWid() return data.l_Ground.cWid;
 
 	/** Level grid-based height **/
-	public var cHei(get,never) : Int; inline function get_cHei() return data.l_Collisions.cHei;
+	public var cHei(get,never) : Int; inline function get_cHei() return data.l_Ground.cHei;
 
 	/** Level pixel width**/
 	public var pxWid(get,never) : Int; inline function get_pxWid() return cWid*Const.GRID;
@@ -22,7 +22,7 @@ class Level extends GameProcess {
 
 		createRootInLayers(Game.ME.scroller, Const.DP_BG);
 		data = ldtkLevel;
-		tilesetSource = hxd.Res.levels.sampleWorldTiles.toAseprite().toTile();
+		tilesetSource = hxd.Res.levels.MasterSimple.toTile();
 		marks = new MarkerMap(cWid, cHei);
 	}
 
@@ -45,23 +45,43 @@ class Level extends GameProcess {
 		invalidated = true;
 	}
 
-	/** Return TRUE if "Collisions" layer contains a collision value **/
+	/** Return TRUE if "Ground" layer does not contain ground **/
 	public inline function hasCollision(cx,cy) : Bool {
-		return !isValid(cx,cy) ? true : data.l_Collisions.getInt(cx,cy)==1;
+		return !isValid(cx,cy) ? true : !(data.l_Ground.getInt(cx,cy)==1);
 	}
 
 	/** Render current level**/
 	function render() {
-		// Placeholder level render
-		root.removeChildren();
 
+		root.removeChildren();
 		var tg = new h2d.TileGroup(tilesetSource, root);
 
-		var layer = data.l_Collisions;
-		for( autoTile in layer.autoTiles ) {
-			var tile = layer.tileset.getAutoLayerTile(autoTile);
+		//TODO: De-jankify this
+		var layer1 = data.l_Ground;
+		var layer2 = data.l_Trees;
+		var layer3 = data.l_Walls;
+		//var layer4 = data.l_Grass;
+		for( autoTile in layer1.autoTiles ) {
+			var tile = layer1.tileset.getAutoLayerTile(autoTile);
 			tg.add(autoTile.renderX, autoTile.renderY, tile);
 		}
+		for( autoTile in layer2.autoTiles ) {
+			var tile = layer2.tileset.getAutoLayerTile(autoTile);
+			tg.add(autoTile.renderX, autoTile.renderY, tile);
+		}
+		for( autoTile in layer3.autoTiles ) {
+			var tile = layer3.tileset.getAutoLayerTile(autoTile);
+			tg.add(autoTile.renderX, autoTile.renderY, tile);
+		}
+		
+		// for (gridTile in layer4.gridTiles) {
+		// 	var tile = layer4.tileset.get;
+		// 	tg.add(gridTile.renderX, gridTile.renderY, tile);
+		// }
+		// layer1.render(tg);
+		// layer3.render(tg);
+		//layer4.render(tg);
+
 	}
 
 	override function postUpdate() {

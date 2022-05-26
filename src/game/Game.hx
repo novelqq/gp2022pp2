@@ -40,7 +40,7 @@ class Game extends dn.Process {
 		hud = new ui.Hud();
 		camera = new Camera();
 
-		startLevel(Assets.worldData.all_levels.FirstLevel);
+		startLevel(Assets.worldData.all_levels.Level_1);
 	}
 
 
