@@ -1,7 +1,7 @@
 class Entity {
     public static var ALL : Array<Entity> = [];
     public static var GC : Array<Entity> = [];
-
+	public static var SQ : Array<Map<String, Int>> = [];
 	// Various getters to access all important stuff easily
 	public var app(get,never) : App; inline function get_app() return App.ME;
 	public var game(get,never) : Game; inline function get_game() return Game.ME;
@@ -171,7 +171,6 @@ class Entity {
     public function new(x:Int, y:Int) {
         uid = Const.makeUniqueId();
 		ALL.push(this);
-
 		cd = new dn.Cooldown(Const.FPS);
 		ucd = new dn.Cooldown(Const.FPS);
         setPosCase(x,y);
@@ -266,7 +265,22 @@ class Entity {
 		return camera.isOnScreenRect( left,top, wid, hei, padding );
 	}
 
+	public function saveSnapshot() {
+		var snapshot : Map<String, Int> = ["cx" => cx, "cy" => cy];
+		SQ.push(snapshot);
 
+	}
+
+	public function RevertSnapshot() {
+		var snapshot = SQ.pop();
+		if (snapshot == null) {
+			//TODO: Delete Entity or do nothing
+		}
+		else {
+			cx = snapshot["cx"];
+			cy = snapshot["cy"];
+		}
+	}
 	/**
 		Changed the current entity state.
 		Return TRUE if the state is `s` after the call.

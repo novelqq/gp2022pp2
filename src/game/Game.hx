@@ -23,7 +23,7 @@ class Game extends dn.Process {
 	var curGameSpeed = 1.0;
 	var slowMos : Map<String, { id:String, t:Float, f:Float }> = new Map();
 
-
+	
 	public function new() {
 		super(App.ME);
 
