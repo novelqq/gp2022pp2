@@ -21,6 +21,7 @@ class Entity {
 	/** Unique identifier **/
 	public var uid(default,null) : Int;
 
+	public var z = 0;
 	/** Grid X coordinate **/
     public var cx = 0;
 	/** Grid Y coordinate **/
@@ -193,6 +194,7 @@ class Entity {
 		cy = y;
 		xr = 0.5;
 		yr = 0.5;
+		z = level.getZValue(x,y);
 		onPosManuallyChangedBoth();
 	}
 
@@ -441,7 +443,7 @@ class Entity {
 	**/
     public function postUpdate() {
 		spr.x = sprX;
-		spr.y = sprY -hei*level.getZValue(cx,cy)*0.5;
+		spr.y = sprY -hei*z*0.5;
         spr.scaleX = dir*sprScaleX * sprSquashX;
         spr.scaleY = sprScaleY * sprSquashY;
 		spr.visible = entityVisible;
@@ -496,6 +498,7 @@ class Entity {
 	**/
 	public function fixedUpdate() {
 		updateLastFixedUpdatePos();
+		z = level.getZValue(cx,cy);
 	}
 
 	/**

@@ -28,12 +28,12 @@ class SampleBox extends Entity {
     //recursively try to push boxes, returning false if unable to be pushed (hits a wall)
     //returns true and begins movement if able to be pushed
     override function tryMoveLeft() {
-        if (level.hasCollision(cx-1, cy)) {
+        if (level.hasCollision(cx-1, cy) || level.getZValue(cx-1, cy) > z) {
             return false;
         }
         for (entity in Entity.ALL) {
             //checks if a box is to the left, and if so, if it can move or not
-            if (Std.isOfType(entity, SampleBox) && entity.cx == cx-1 && entity.cy == cy && !entity.tryMoveLeft()) {
+            if (Std.isOfType(entity, SampleBox) && entity.cx == cx-1 && entity.cy == cy && entity.z == z && !entity.tryMoveLeft()) {
                 return false;
             }
         }
@@ -42,11 +42,11 @@ class SampleBox extends Entity {
     }
 
     override function tryMoveRight() {
-        if (level.hasCollision(cx+1, cy)) {
+        if (level.hasCollision(cx+1, cy) || level.getZValue(cx+1, cy) > z) {
             return false;
         }
         for (entity in Entity.ALL) {
-            if (Std.isOfType(entity, SampleBox) && entity.cx == cx+1 && entity.cy == cy && !entity.tryMoveRight()) {
+            if (Std.isOfType(entity, SampleBox) && entity.cx == cx+1 && entity.cy == cy && entity.z == z && !entity.tryMoveRight()) {
                 return false;
             }
         }
@@ -55,11 +55,11 @@ class SampleBox extends Entity {
     }
 
     override function tryMoveUp() {
-        if (level.hasCollision(cx, cy-1)) {
+        if (level.hasCollision(cx, cy-1) || level.getZValue(cx, cy-1) > z) {
             return false;
         }
         for (entity in Entity.ALL) {
-            if (Std.isOfType(entity, SampleBox) && entity.cx == cx && entity.cy == cy-1 && !entity.tryMoveUp()) {
+            if (Std.isOfType(entity, SampleBox) && entity.cx == cx && entity.cy == cy-1 && entity.z == z && !entity.tryMoveUp()) {
                 return false;
             }
         }
@@ -68,11 +68,11 @@ class SampleBox extends Entity {
     }
 
     override function tryMoveDown() {
-        if (level.hasCollision(cx, cy+1)) {
+        if (level.hasCollision(cx, cy+1) || level.getZValue(cx, cy+1) > z) {
             return false;
         }
         for (entity in Entity.ALL) {
-            if (Std.isOfType(entity, SampleBox) && entity.cx == cx && entity.cy == cy+1 && !entity.tryMoveDown()) {
+            if (Std.isOfType(entity, SampleBox) && entity.cx == cx && entity.cy == cy+1 && entity.z == z && !entity.tryMoveDown()) {
                 return false;
             }
         }

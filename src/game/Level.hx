@@ -47,7 +47,7 @@ class Level extends GameProcess {
 
 	/** Return TRUE if "Ground" layer does not contain ground **/
 	public inline function hasCollision(cx,cy) : Bool {
-		return !isValid(cx,cy);
+		return getZValue(cx,cy) == 0;
 	}
 
 	public inline function getZValue(cx,cy): Int {
