@@ -21,6 +21,7 @@ class Entity {
 	/** Unique identifier **/
 	public var uid(default,null) : Int;
 
+	/* Grid Z coordinate */
 	public var z = 0;
 	/** Grid X coordinate **/
     public var cx = 0;
@@ -498,7 +499,6 @@ class Entity {
 	**/
 	public function fixedUpdate() {
 		updateLastFixedUpdatePos();
-		z = level.getZValue(cx,cy);
 	}
 
 	/**
