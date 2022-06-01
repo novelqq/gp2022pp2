@@ -10,13 +10,10 @@ class SampleGame extends Game {
 
 	override function startLevel(l:World_Level) {
 		super.startLevel(l);
+		for (startloc in level.data.l_Entities.all_Box) {
+			new SampleBox(startloc.cx, startloc.cy);
+		}
 		new SamplePlayer();
-		new SampleBox(l.l_Entities.all_Box[0].cx, l.l_Entities.all_Box[0].cy);
-		new SampleBox(l.l_Entities.all_Box[1].cx, l.l_Entities.all_Box[1].cy);
-		// for (i in 0...1) {
-		// 	var start = l.l_Entities.all_Box[i];
-		// 	new SampleBox(start.cx, start.cy);
-		// }
 	}
 }
 

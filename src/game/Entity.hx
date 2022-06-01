@@ -15,22 +15,14 @@ class Entity {
 	var utmod(get,never) : Float; inline function get_utmod() return Game.ME.utmod;
 	public var hud(get,never) : ui.Hud; inline function get_hud() return Game.ME.hud;
 
-	/**	Attributes **/
-	public var isPushable = false;
-	public var isSolid = false;
-
-	/** Cooldowns **/
-	public var cd : dn.Cooldown;
-
-	/** Cooldowns, unaffected by slowmo (ie. always in realtime) **/
-	public var ucd : dn.Cooldown;
-
 	/** State machine. Value should only be changed using `startState(v)` **/
 	public var state(default,null) : State;
 
 	/** Unique identifier **/
 	public var uid(default,null) : Int;
 
+	/* Grid Z coordinate */
+	public var z = 0;
 	/** Grid X coordinate **/
     public var cx = 0;
 	/** Grid Y coordinate **/
@@ -110,14 +102,6 @@ class Entity {
 	/** Color matrix transformation applied to sprite **/
 	public var colorMatrix : h3d.Matrix;
 
-	// Animated blink color on damage hit
-	var blinkColor : h3d.Vector;
-
-	/** Sprite X shake power **/
-	var shakePowX = 0.;
-	/** Sprite Y shake power **/
-	var shakePowY = 0.;
-
 	// Debug stuff
 	var debugLabel : Null<h2d.Text>;
 	var debugBounds : Null<h2d.Graphics>;
@@ -126,7 +110,7 @@ class Entity {
 	/** Defines X alignment of entity at its attach point (0 to 1.0) **/
 	public var pivotX(default,set) : Float = 0.5;
 	/** Defines Y alignment of entity at its attach point (0 to 1.0) **/
-	public var pivotY(default,set) : Float = 1;
+	public var pivotY(default,set) : Float = 0.5;
 
 	/** Entity attach X pixel coordinate **/
 	public var attachX(get,never) : Float; inline function get_attachX() return (cx+xr)*Const.GRID;
@@ -171,8 +155,6 @@ class Entity {
     public function new(x:Int, y:Int) {
         uid = Const.makeUniqueId();
 		ALL.push(this);
-		cd = new dn.Cooldown(Const.FPS);
-		ucd = new dn.Cooldown(Const.FPS);
         setPosCase(x,y);
 		state = Normal;
 
@@ -180,7 +162,6 @@ class Entity {
 		Game.ME.scroller.add(spr, Const.DP_MAIN);
 		spr.colorAdd = new h3d.Vector();
 		baseColor = new h3d.Vector();
-		blinkColor = new h3d.Vector();
 		spr.colorMatrix = colorMatrix = h3d.Matrix.I();
 		spr.setCenterRatio(pivotX, pivotY);
 
@@ -213,6 +194,7 @@ class Entity {
 		cy = y;
 		xr = 0.5;
 		yr = 0.5;
+		z = level.getZValue(x,y);
 		onPosManuallyChangedBoth();
 	}
 
@@ -363,7 +345,6 @@ class Entity {
         ALL.remove(this);
 
 		baseColor = null;
-		blinkColor = null;
 		colorMatrix = null;
 
 		spr.remove();
@@ -378,9 +359,6 @@ class Entity {
 			debugBounds.remove();
 			debugBounds = null;
 		}
-
-		cd.destroy();
-		cd = null;
     }
 
 
@@ -445,18 +423,6 @@ class Entity {
 		debugBounds.drawCircle(centerX-attachX, centerY-attachY, 3);
 	}
 
-	/** Blink `spr` briefly (eg. when damaged by something) **/
-	public function blink(c:UInt) {
-		blinkColor.setColor(c);
-		cd.setS("keepBlink",0.06);
-	}
-
-	public function shakeS(xPow:Float, yPow:Float, t:Float) {
-		cd.setS("shaking", t, true);
-		shakePowX = xPow;
-		shakePowY = yPow;
-	}
-
 	/** Briefly squash sprite on X (Y changes accordingly). "1.0" means no distorsion. **/
 	public function setSquashX(scaleX:Float) {
 		sprSquashX = scaleX;
@@ -474,9 +440,6 @@ class Entity {
 		"Beginning of the frame" loop, called before any other Entity update loop
 	**/
     public function preUpdate() {
-		ucd.update(utmod);
-		cd.update(tmod);
-
 
 		#if debug
 		// Show bounds (with `/bounds` in console)
@@ -495,7 +458,7 @@ class Entity {
 	**/
     public function postUpdate() {
 		spr.x = sprX;
-		spr.y = sprY;
+		spr.y = sprY -hei*z*0.5;
         spr.scaleX = dir*sprScaleX * sprSquashX;
         spr.scaleY = sprScaleY * sprSquashY;
 		spr.visible = entityVisible;
@@ -503,23 +466,8 @@ class Entity {
 		sprSquashX += (1-sprSquashX) * M.fmin(1, 0.2*tmod);
 		sprSquashY += (1-sprSquashY) * M.fmin(1, 0.2*tmod);
 
-		if( cd.has("shaking") ) {
-			spr.x += Math.cos(ftime*1.1)*shakePowX * cd.getRatio("shaking");
-			spr.y += Math.sin(0.3+ftime*1.7)*shakePowY * cd.getRatio("shaking");
-		}
-
-		// Blink
-		if( !cd.has("keepBlink") ) {
-			blinkColor.r*=Math.pow(0.60, tmod);
-			blinkColor.g*=Math.pow(0.55, tmod);
-			blinkColor.b*=Math.pow(0.50, tmod);
-		}
-
 		// Color adds
 		spr.colorAdd.load(baseColor);
-		spr.colorAdd.r += blinkColor.r;
-		spr.colorAdd.g += blinkColor.g;
-		spr.colorAdd.b += blinkColor.b;
 
 		// Debug label
 		if( debugLabel!=null ) {
