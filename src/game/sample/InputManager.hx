@@ -1,5 +1,7 @@
 package sample;
 
+import js.html.InputEvent;
+
 class InputManager {
     var ca : ControllerAccess<GameAction>;
 
@@ -15,11 +17,21 @@ class InputManager {
 
     }
     
+    public function addListener(entity:Entity) {
+        ents.push(entity);
+    }
     public function dispose() {
         ca.dispose();
     }
 
     public function preUpdate() {
-
+        for(entity in ents) {
+            entity.move_left = ca.isDown(MoveLeft);
+			entity.move_right = ca.isDown(MoveRight);
+			entity.move_up = ca.isDown(MoveUp);
+			entity.move_down = ca.isDown(MoveDown);
+        }
+        //listen for input
+        //delegate input to listening entities (ents array)
     }
 }
