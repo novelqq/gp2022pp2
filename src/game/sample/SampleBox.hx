@@ -95,10 +95,10 @@ class SampleBox extends Entity {
 		while (xr > 1) {cx++; xr--;}
 		while (xr < 0) {cx--; xr++;}
 		while (yr > 1) {cy++; yr--; 
-            //level.root.add(spr, cy);
+            level.root.add(spr, cy);
         }
 		while (yr < 0) {cy--; yr++; 
-            //level.root.add(spr, cy);
+            level.root.add(spr, cy);
         }
 
         //if grid aligned (which happens when not moving and at the end of movement), reset input

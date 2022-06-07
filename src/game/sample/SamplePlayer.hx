@@ -18,8 +18,6 @@ class SamplePlayer extends SampleBox {
 	var is_moving: Bool = false;
 
 	public function new() {
-		
-
 		// Start point using level entity "PlayerStart"
 		var start = level.data.l_Entities.all_PlayerStart[0];
 		if( start!=null ) {
@@ -27,8 +25,7 @@ class SamplePlayer extends SampleBox {
 		} else {
 			super(0,0);
 		}
-			
-
+		
 		// Camera tracks this
 		camera.trackEntity(this, true);
 		camera.clampToLevelBounds = true;
@@ -87,7 +84,7 @@ class SamplePlayer extends SampleBox {
 				is_moving = true;
 			}
 		}
-		if (is_moving) {
+		if (is_moving || isFalling) {
 			super.fixedUpdate();
 		} else if (cooldown_frames > 0) {
 			cooldown_frames -= 1;

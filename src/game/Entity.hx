@@ -161,6 +161,7 @@ class Entity {
 
         spr = new HSprite(Assets.tiles);
 		Game.ME.scroller.add(spr, Const.DP_MAIN);
+		//level.root.add(spr,y);
 		spr.colorAdd = new h3d.Vector();
 		baseColor = new h3d.Vector();
 		spr.colorMatrix = colorMatrix = h3d.Matrix.I();

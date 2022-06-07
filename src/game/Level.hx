@@ -95,7 +95,7 @@ class Level extends GameProcess {
 					//Add top tile
 					yGroup.add(x*Const.GRID, (y-z/2)*Const.GRID, tiles[5]);
 				} else if (z == left && z == right && z == up && z != down) {
-					//Add bottom tile
+					//Add bottom tile + walls
 					for (wallHeight in 0...z) {
 						yGroup.add(x*Const.GRID, (y-wallHeight/2)*Const.GRID, tiles[9]);
 					}
@@ -104,7 +104,7 @@ class Level extends GameProcess {
 					//Add top-left tile
 					yGroup.add(x*Const.GRID, (y-z/2)*Const.GRID, tiles[0]);
 				} else if (z != left && z == right && z == up && z != down) {
-					//Add bottom-left tile
+					//Add bottom-left tile + walls
 					for (wallHeight in 0...z) {
 						yGroup.add(x*Const.GRID, (y-wallHeight/2)*Const.GRID, tiles[4]);
 					}
@@ -113,7 +113,7 @@ class Level extends GameProcess {
 					//Add top-right tile
 					yGroup.add(x*Const.GRID, (y-z/2)*Const.GRID, tiles[10]);
 				} else if (z == left && z != right && z == up && z != down) {
-					//Add bottom-right tile
+					//Add bottom-right tile + walls
 					for (wallHeight in 0...z) {
 						yGroup.add(x*Const.GRID, (y-wallHeight/2)*Const.GRID, tiles[14]);
 					}
@@ -122,7 +122,7 @@ class Level extends GameProcess {
 					//Add left-right tile
 					yGroup.add(x*Const.GRID, (y-z/2)*Const.GRID, tiles[16]);
 				} else if (z == left && z == right && z != up && z != down) {
-					//Add top-bottom tile
+					//Add top-bottom tile + walls
 					for (wallHeight in 0...z) {
 						yGroup.add(x*Const.GRID, (y-wallHeight/2)*Const.GRID, tiles[9]);
 					}
@@ -131,41 +131,34 @@ class Level extends GameProcess {
 					//Add top-left-right tile
 					yGroup.add(x*Const.GRID, (y-z/2)*Const.GRID, tiles[15]);
 				} else if (z != left && z != right && z == up && z != down) {
-					//Add bottom-left-right tile
+					//Add bottom-left-right tile + walls
 					for (wallHeight in 0...z) {
 						yGroup.add(x*Const.GRID, (y-wallHeight/2)*Const.GRID, tiles[19]);
 					}
 					yGroup.add(x*Const.GRID, (y-z/2)*Const.GRID, tiles[17]);
 				} else if (z != left && z == right && z != up && z != down) {
+					//Add top-bottom-left tile + walls
 					for (wallHeight in 0...z) {
 						yGroup.add(x*Const.GRID, (y-wallHeight/2)*Const.GRID, tiles[4]);
 					}
-					//Add top-bottom-left tile
 					yGroup.add(x*Const.GRID, (y-z/2)*Const.GRID, tiles[3]);
 				} else if (z == left && z != right && z != up && z != down) {
+					//Add top-bottom-right tile + walls
 					for (wallHeight in 0...z) {
 						yGroup.add(x*Const.GRID, (y-wallHeight/2)*Const.GRID, tiles[14]);
-					}
-					//Add top-bottom-right tile
+					}					
 					yGroup.add(x*Const.GRID, (y-z/2)*Const.GRID, tiles[13]);
 				} else if (z != left && z != right && z != up && z != down) {
-					//Add top-bottom-left-right tile
+					//Add top-bottom-left-right tile + walls
+					for (wallHeight in 0...z) {
+						yGroup.add(x*Const.GRID, (y-wallHeight/2)*Const.GRID, tiles[19]);
+					}
 					yGroup.add(x*Const.GRID, (y-z/2)*Const.GRID, tiles[18]);
 				}
 			}
 			root.add(yGroup, y, -1);
 		}
 		sortLayers();
-
-
-
-		
-		// var tg = new h2d.TileGroup(tilesetSource, root);
-
-		// data.l_Level.render(tg);
-		// data.l_Height1.render(tg);
-		// data.l_Height2.render(tg);
-		// data.l_Height3.render(tg);
 	}
 
 	public function sortLayers() {
