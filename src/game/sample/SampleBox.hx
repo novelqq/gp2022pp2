@@ -10,9 +10,7 @@ class SampleBox extends Entity {
 	var temp_dy = 0.;
 
     public function new(x, y) {
-		super(5,5);
-
-        setPosCase(x,y);
+		super(x,y);
         makeSprite();
 	}
 
@@ -96,29 +94,35 @@ class SampleBox extends Entity {
 		yr += temp_dy;
 		while (xr > 1) {cx++; xr--;}
 		while (xr < 0) {cx--; xr++;}
-		while (yr > 1) {cy++; yr--;}
-		while (yr < 0) {cy--; yr++;}
+		while (yr > 1) {cy++; yr--; 
+            //level.root.add(spr, cy);
+        }
+		while (yr < 0) {cy--; yr++; 
+            //level.root.add(spr, cy);
+        }
 
         //if grid aligned (which happens when not moving and at the end of movement), reset input
 		if (Math.abs(xr - 0.5) < manual_float_error && Math.abs(yr - 0.5) < manual_float_error) {
+             //level.sortLayers();
 			resetInput();
 		}
 
         //while not in motion, checks if there is a level or box under the entity, otherwise decrements z until there is
-        while(isFalling) {
-            if (level.getZValue(cx,cy) == z) {
+        if(isFalling) {
+            if (level.getZValue(cx,cy) == z || z < 0) {
                 isFalling = false;
-            }
-            for (entity in Entity.ALL) {
-                if (Std.isOfType(entity, SampleBox) && entity.cx == cx && entity.cy == cy && entity.z == z-1) {
-                    isFalling = false;
+            } else {
+                for (entity in Entity.ALL) {
+                    if (Std.isOfType(entity, SampleBox) && entity.cx == cx && entity.cy == cy && entity.z == z-1) {
+                        isFalling = false;
+                    }
                 }
             }
-            if (isFalling) {
-                z--;
-            }
         }
-
-        super.fixedUpdate();
+        if (isFalling ) {
+            z--;
+            SamplePlayer.cooldown_frames = 2;
+        }
+    super.fixedUpdate();
 	}
 }

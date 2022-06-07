@@ -14,16 +14,20 @@ class SamplePlayer extends SampleBox {
 	var move_left : Bool = false;
 	var move_up : Bool = false;
 	var move_down: Bool = false;
-	var cooldown_frames: Int = 0;
+	public static var cooldown_frames: Int = 0;
 	var is_moving: Bool = false;
 
 	public function new() {
-		super(5,5);
+		
 
 		// Start point using level entity "PlayerStart"
 		var start = level.data.l_Entities.all_PlayerStart[0];
-		if( start!=null )
-			setPosCase(start.cx, start.cy);
+		if( start!=null ) {
+			super(start.cx,start.cy);
+		} else {
+			super(0,0);
+		}
+			
 
 		// Camera tracks this
 		camera.trackEntity(this, true);

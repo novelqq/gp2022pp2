@@ -18,7 +18,7 @@ class Level extends GameProcess {
 	public var marks : tools.MarkerMap<Types.LevelMark>;
 	var invalidated = true;
 
-	var intGrid : Array<Array<Int>>;
+	public var intGrid : Array<Array<Int>>;
 
 	public function new(ldtkLevel:World.World_Level) {
 		super();
@@ -28,11 +28,7 @@ class Level extends GameProcess {
 		marks = new MarkerMap(cWid, cHei);
 
 		//initializes intgrid
-		// for (x in 0 ... cWid) {
-		// 	for (y in 0 ... cHei) {
-		// 		intGrid[x][y] = !isValid(x,y) ? 0 : data.l_Level.getInt(x,y)-1;
-		// 	}
-		// }
+		intGrid = [for (x in 0 ... cWid-1) [for (y in 0 ... cHei - 1) data.l_Level.getInt(x,y)-1]];
 
 		tiles = [
 			for (x in 0 ... Std.int(tilesetSource.width/Const.GRID)) 
